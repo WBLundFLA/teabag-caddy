@@ -22,13 +22,12 @@ lat_strand = 1.6;
 // uc_z_off maps profile-Y to world-Z: world-Z = profile-Y + uc_z_off
 //   arc bottom  world-Z = uc_z_off - uc_bot_w/2 = 35 - 15 = 20 mm
 //   top of profile world-Z = 35 + 40 = 75 > wall_h = 70 (guaranteed open)
-uc_bot_w = 30;
-uc_top_w = 46;
-uc_dep   = 40;
-uc_z_off = 35;
-uc_cr    = 8;    // concave corner radius at wall-top opening
+uc_bot_w = 30;    // bottom semicircle diameter
+uc_top_w = 36;    // distance between top-corner circle centres
+uc_cr    = 8;     // top-corner circle radius (also controls how far above wall the cut exits)
+uc_z_off = 35;    // Z offset: arc bottom lands at Z = uc_z_off - uc_bot_w/2 = 20
 
-// Profile-Y that corresponds to the wall top (world-Z = wall_h)
+// Profile-Y at wall top (world-Z = wall_h = 70)
 uc_y_wt  = wall_h - uc_z_off;   // = 35
 
 // --- Tongue/groove joint ---
@@ -44,37 +43,23 @@ tx2 = ow + 2*(cell_w + dt) - dt/2;
 tx_c = total_w / 2;
 
 // --- 2-D U-profile ---
-// Hull body: bottom half-circle flaring to wide top.
-// Concave corner fillets at wall-top level: arc center is in the solid
-// wall material so the curve sweeps from solid into the U opening.
+// Hull of bottom half-circle + two side circles at wall-top level.
+// The side circles are centred at (+-uc_top_w/2, uc_y_wt) -- IN the solid
+// wall material -- so the hull curve sweeps smoothly from solid into U.
+// Profile is widest at uc_y_wt (wall top) and tapers down to uc_bot_w.
+// Circles reach Y = uc_y_wt + uc_cr = 43, mapping to world-Z = 78 > 70
+// so the cut is guaranteed to break through the wall top with no hard edge.
 module u_profile_2d() {
-    union() {
-        // Main body
-        hull() {
-            intersection() {
-                circle(r = uc_bot_w/2, $fn = 64);
-                translate([-(uc_bot_w/2 + 1), -uc_bot_w])
-                    square([uc_bot_w + 2, uc_bot_w]);
-            }
-            translate([-(uc_top_w/2), uc_dep - 1])
-                square([uc_top_w, 2]);
+    hull() {
+        // Bottom half-circle (dips below Y=0)
+        intersection() {
+            circle(r = uc_bot_w/2, $fn = 64);
+            translate([-(uc_bot_w/2 + 1), -uc_bot_w])
+                square([uc_bot_w + 2, uc_bot_w]);
         }
-        // Right top concave fillet:
-        //   square at top-right corner, minus arc whose centre
-        //   is at (uc_top_w/2 + uc_cr, uc_y_wt - uc_cr) -- in solid wall
-        difference() {
-            translate([uc_top_w/2, uc_y_wt - uc_cr])
-                square([uc_cr, uc_cr]);
-            translate([uc_top_w/2 + uc_cr, uc_y_wt - uc_cr])
-                circle(r = uc_cr, $fn = 32);
-        }
-        // Left top concave fillet (mirror of right)
-        difference() {
-            translate([-(uc_top_w/2 + uc_cr), uc_y_wt - uc_cr])
-                square([uc_cr, uc_cr]);
-            translate([-(uc_top_w/2), uc_y_wt - uc_cr])
-                circle(r = uc_cr, $fn = 32);
-        }
+        // Top-corner circles: centres in solid wall, arcs sweep into U
+        translate([ uc_top_w/2, uc_y_wt]) circle(r = uc_cr, $fn = 32);
+        translate([-uc_top_w/2, uc_y_wt]) circle(r = uc_cr, $fn = 32);
     }
 }
 
