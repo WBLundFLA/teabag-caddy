@@ -1,6 +1,6 @@
 use <lattice_wall.scad>
 
-// ── Overall dimensions ────────────────────────────────
+// --- Overall dimensions ---
 total_w = 220;    // full tray width across drawer
 half_d  = 148;    // front-to-back depth per half
 wall_h  = 70;     // wall height
@@ -13,22 +13,22 @@ bt      = 3.0;    // base thickness
 cell_w = (total_w - 2*ow - (cols-1)*dt) / cols;
 cell_d = (half_d  - 2*ow - dt) / rows;
 
-// ── Lattice ───────────────────────────────────────────
+// --- Lattice ---
 lat_gap    = 12;
 lat_strand = 1.6;
 
-// ── Finger-cutout geometry ────────────────────────────
-// Profile lives in the XY plane with Y pointing up the wall.
-// The arc dips to Y = -uc_bot_w/2; the open top is at Y = uc_dep.
+// --- Finger-cutout geometry ---
+// Profile lives in XY plane with Y pointing up the wall.
+// Arc dips to Y = -uc_bot_w/2; open top is at Y = uc_dep.
 // uc_z_off positions the arc: bottom-of-arc lands at
-//   Z = uc_z_off - uc_bot_w/2  (currently 35-15 = 20 mm above base)
-// Top of profile lands at Z = uc_z_off + uc_dep = 35+40 = 75 > wall_h ✓
+//   Z = uc_z_off - uc_bot_w/2  (= 35 - 15 = 20 mm above base)
+// Top of profile at Z = uc_z_off + uc_dep = 35+40 = 75 > wall_h (good)
 uc_bot_w = 30;   // semicircle diameter (narrow base)
 uc_top_w = 46;   // flared opening width at top
 uc_dep   = 40;   // profile height from arc-centre line to top edge
 uc_z_off = 35;   // Z placement of arc-centre line
 
-// ── Tongue/groove joint ───────────────────────────────
+// --- Tongue/groove joint ---
 tl  = 40;
 th  = 10;
 tt  = 5;
@@ -36,9 +36,8 @@ tol = 0.3;
 
 function ccx(i) = ow + i*(cell_w + dt) + cell_w/2;
 
-// ── 2-D U-profile (smooth, flared) ───────────────────
-// Convex hull of a bottom half-circle and a wide top line.
-// Result: rounded base, straight-flaring sides, no sharp corners.
+// 2-D U-profile: convex hull of bottom half-circle + wide top line.
+// Result: rounded base, flaring sides, no sharp corners anywhere.
 module u_profile_2d() {
     hull() {
         // Bottom half-circle (arc dips below Y=0)
@@ -47,15 +46,14 @@ module u_profile_2d() {
             translate([-(uc_bot_w/2 + 1), -uc_bot_w])
                 square([uc_bot_w + 2, uc_bot_w]);
         }
-        // Wide top opening line (extends well above wall_h after transform)
+        // Wide top opening line (extends above wall_h after Z transform)
         translate([-(uc_top_w/2), uc_dep - 1])
             square([uc_top_w, 2]);
     }
 }
 
-// ── 3-D cutout through a wall of thickness wt ─────────
-// After rotate([90,0,0]) profile-Y becomes world-Z, extrusion becomes world-Y.
-// translate([0, wt+0.1, uc_z_off]) positions the cut in the wall.
+// 3-D cutout through a wall of thickness wt.
+// rotate([90,0,0]) maps profile-Y to world-Z, extrusion to world-Y.
 module u_cut(wt) {
     translate([0, wt + 0.1, uc_z_off])
         rotate([90, 0, 0])
@@ -63,7 +61,7 @@ module u_cut(wt) {
                 u_profile_2d();
 }
 
-// ── Half-tray ─────────────────────────────────────────
+// --- Half-tray ---
 module caddy_half(is_front = true) {
     wy_back = half_d - ow;
     wy_div  = ow + cell_d;
@@ -102,13 +100,13 @@ module caddy_half(is_front = true) {
                 translate([tx2 - tl/2, 0, bt + 3]) cube([tl, tt*2, th]);
             }
         }
-        // U cutouts — front outer wall
+        // U cutouts on front outer wall
         for (i = [0 : cols-1])
             translate([ccx(i), 0, 0]) u_cut(ow);
-        // U cutouts — back outer wall
+        // U cutouts on back outer wall
         for (i = [0 : cols-1])
             translate([ccx(i), wy_back, 0]) u_cut(ow);
-        // U cutouts — horizontal divider
+        // U cutouts on horizontal divider
         for (i = [0 : cols-1])
             translate([ccx(i), wy_div, 0]) u_cut(dt);
         // Groove pockets (back half only)
