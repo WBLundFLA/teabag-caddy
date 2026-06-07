@@ -99,6 +99,6 @@ default_filament_profile = Generic PLA @SV06
 [physical_printer:Sovol SV06 OctoPrint]
 host_type = octoprint
 print_host = https://octoprint.wblsoft
-apikey = YOUR_OCTOPRINT_API_KEY_HERE
+printhost_apikey = YOUR_OCTOPRINT_API_KEY_HERE
 printhost_ssl_ignore_revoked = 0
 preset_names = Sovol SV06
