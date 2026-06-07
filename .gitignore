@@ -1,4 +1,6 @@
 *.stl
+!files/caddy_front.stl
+!files/caddy_back.stl
 *.zip
 *.bak
 slicer/teabag-caddy.ini
