@@ -1,7 +1,7 @@
 use <lattice_wall.scad>
 
 // --- Overall dimensions ---
-total_w = 220;
+total_w = 215;
 half_d  = 148;
 wall_h  = 70;
 cols    = 3;
@@ -35,6 +35,11 @@ tl  = 40;
 th  = 10;
 tt  = 5;
 tol = 0.5;
+
+// Back half centre tongue — sized to fit as-printed front groove (30mm wide, 11mm tall, ~2.5mm deep)
+tl_c = 28;   // 1mm clearance each side of 30mm opening
+th_c = 9;    // 1mm clearance each side of 11mm opening
+tt_c = 2;    // conservative fit for ~2.5mm groove depth
 
 function ccx(i) = ow + i*(cell_w + dt) + cell_w/2;
 
@@ -113,7 +118,7 @@ module caddy_half(is_front = true) {
             } else {
                 translate([tx1 - tl/2, 0, bt+3]) cube([tl, tt*2, th]);
                 translate([tx2 - tl/2, 0, bt+3]) cube([tl, tt*2, th]);
-                translate([tx_c - tl/2, -tt, bt+3]) cube([tl, tt, th]);
+                translate([tx_c - tl_c/2, -tt_c, bt+3]) cube([tl_c, tt_c, th_c]);
             }
         }
 
