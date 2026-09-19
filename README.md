@@ -2,6 +2,7 @@
 
 OpenSCAD design for a 3x4 tea bag drawer organiser. Bags sit vertically, tags visible,
 U-shaped finger cutouts make grabbing easy.
+Part of the Wabble 3D capability fleet, governed by `WBLundFLA/wabble-print-capabilities`.
 
 ## Design
 

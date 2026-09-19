@@ -4,6 +4,8 @@
 
 OpenSCAD design for a 3x4 tea bag drawer caddy. Two interlocking 3x2 halves,
 printed on a Sovol SV06 (235x235mm bed). Files are in the `files/` subfolder.
+Fleet Hub: `WBLundFLA/wabble-print-capabilities` (Florida Sovol profile: `printers/william-sovol-sv06.json`).
+Governance: Adheres to WSOP. Read `AI_BOOTSTRAP.md` before making changes.
 
 ## File roles
 
